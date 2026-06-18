@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Grimoire — D&D Companion</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#110e07; --panel:#1b1409; --panel2:#221a0a;
+  --border:#3a2b0e; --border2:#4d3a18;
+  --gold:#c9a96e; --gold-dim:#7a5f32; --gold-faint:rgba(201,169,110,0.08);
+  --red:#8b1a1a; --red-br:#c0392b;
+  --ink:#e8d5a3; --ink-dim:#8a7650; --ink-faint:rgba(232,213,163,0.06);
+  --shadow:#090703;
+  --green:#2d5e2d; --green-br:#4a9a4a;
+  --blue:#1a3a5e; --blue-br:#4a90c4;
+  --radius:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Crimson Text',serif;background:var(--bg);color:var(--ink);display:flex;height:100vh}
+
+/* ── SIDEBAR ── */
+#sidebar{width:72px;background:var(--shadow);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:14px 0 10px;gap:4px;flex-shrink:0;z-index:20}
+.logo{font-family:'Cinzel',serif;font-size:18px;color:var(--gold);margin-bottom:14px;text-align:center;line-height:1;text-shadow:0 0 14px rgba(201,169,110,0.4);user-select:none;letter-spacing:0.05em}
+.nav-btn{width:52px;height:52px;border-radius:var(--radius);border:1px solid transparent;background:transparent;color:var(--ink-dim);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .2s;position:relative}
+.nav-btn:hover{border-color:var(--border2);color:var(--ink);background:var(--ink-faint)}
+.nav-btn.active{border-color:var(--gold-dim);color:var(--gold);background:var(--gold-faint)}
+.nav-btn .icon{font-size:18px;line-height:1}
+.nav-btn .lbl{font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.05em;text-transform:uppercase}
+.lock-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--red);border-radius:50%}
+.spacer{flex:1}
+#admin-btn{width:52px;padding:8px 4px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--ink-dim);font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;text-align:center;transition:all .2s;line-height:1.4}
+#admin-btn:hover{border-color:var(--border2);color:var(--ink)}
+#admin-btn.on{border-color:var(--red);color:var(--red-br);background:rgba(139,26,26,.12)}
+
+/* ── TOPBAR ── */
+#topbar{height:48px;background:var(--shadow);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0}
+#page-title{font-family:'Cinzel',serif;font-size:15px;color:var(--gold);letter-spacing:.1em}
+#sync-indicator{font-size:11px;color:var(--ink-dim);font-style:italic;display:flex;align-items:center;gap:5px}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green-br);animation:syncPulse 2s ease-in-out infinite}
+@keyframes syncPulse{0%,100%{opacity:1}50%{opacity:.3}}
+#role-pill{margin-left:auto;padding:3px 12px;border-radius:20px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;border:1px solid;transition:all .3s}
+#role-pill.player{border-color:var(--gold-dim);color:var(--gold);background:var(--gold-faint)}
+#role-pill.admin{border-color:var(--red);color:var(--red-br);background:rgba(139,26,26,.12)}
+
+/* ── LAYOUT ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#content{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+#content::-webkit-scrollbar{width:5px}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.page{display:none;padding:24px;animation:fadeIn .25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.sh h2{font-family:'Cinzel',serif;font-size:18px;color:var(--gold);letter-spacing:.07em}
+.badge{padding:2px 9px;border-radius:10px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.08em;border:1px solid}
+.badge.green{border-color:var(--green);color:var(--green-br)}
+.badge.red{border-color:var(--red);color:var(--red-br);background:rgba(139,26,26,.1)}
+.badge.blue{border-color:var(--blue);color:var(--blue-br)}
+
+/* ── LOCKED ── */
+.locked{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:380px;gap:16px}
+.wax{width:90px;height:90px;background:radial-gradient(circle at 35% 35%,#9b1c1c,#3a0a0a);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;box-shadow:0 4px 20px rgba(0,0,0,.6);animation:waxPulse 3s ease-in-out infinite}
+@keyframes waxPulse{0%,100%{box-shadow:0 4px 20px rgba(0,0,0,.6),0 0 0 0 rgba(139,26,26,0)}50%{box-shadow:0 4px 20px rgba(0,0,0,.6),0 0 0 10px rgba(139,26,26,.15)}}
+.locked-title{font-family:'Cinzel',serif;font-size:20px;color:var(--red-br);letter-spacing:.12em}
+.locked-sub{color:var(--ink-dim);font-size:14px;font-style:italic}
+
+/* ── BUTTONS ── */
+.btn{padding:7px 16px;border-radius:var(--radius);border:1px solid;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.08em;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-gold{border-color:var(--gold-dim);color:var(--gold);background:var(--gold-faint)}
+.btn-gold:hover{background:rgba(201,169,110,.16)}
+.btn-red{border-color:var(--red);color:var(--red-br);background:rgba(139,26,26,.1)}
+.btn-red:hover{background:rgba(139,26,26,.22)}
+.btn-green{border-color:var(--green);color:var(--green-br);background:rgba(45,94,45,.1)}
+.btn-green:hover{background:rgba(45,94,45,.22)}
+.btn-blue{border-color:var(--blue);color:var(--blue-br);background:rgba(26,58,94,.12)}
+.btn-blue:hover{background:rgba(26,58,94,.25)}
+.btn-ghost{border-color:var(--border);color:var(--ink-dim);background:transparent}
+.btn-ghost:hover{border-color:var(--border2);color:var(--ink)}
+.inp{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);color:var(--ink);padding:8px 12px;font-family:'Crimson Text',serif;font-size:15px;outline:none;transition:border-color .2s;width:100%}
+.inp:focus{border-color:var(--gold-dim)}
+.inp::placeholder{color:var(--ink-dim)}
+select.inp option{background:var(--panel2);color:var(--ink)}
+
+/* ══════════════════════════════
+   MAP PAGE
+══════════════════════════════ */
+#map-wrap{position:relative;background:#0a0804;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;height:calc(100vh - 200px);min-height:320px;display:flex;align-items:center;justify-content:center}
+#map-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;transform-origin:center center;transition:none;user-select:none;pointer-events:none;display:none}
+#map-img.loaded{display:block}
+#map-placeholder{text-align:center;color:var(--ink-dim);font-style:italic;font-size:15px;pointer-events:none}
+#map-placeholder .big{font-size:48px;margin-bottom:12px}
+#map-pins-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#map-pins-svg.pin-mode{pointer-events:all;cursor:crosshair}
+.map-tb{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+#map-upload-btn{display:none}
+.map-ctrl{position:absolute;bottom:12px;right:12px;display:flex;flex-direction:column;gap:5px}
+.map-c-btn{width:32px;height:32px;background:rgba(17,14,7,.85);border:1px solid var(--border);border-radius:6px;color:var(--gold);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.map-c-btn:hover{border-color:var(--gold-dim)}
+.map-pin-type{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.pin-type-btn{padding:4px 10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--ink-dim);font-family:'Cinzel',serif;font-size:8px;letter-spacing:.05em;cursor:pointer;transition:all .15s}
+.pin-type-btn.active,.pin-type-btn:hover{border-color:var(--gold-dim);color:var(--gold);background:var(--gold-faint)}
+.pin-label{font-size:11px;color:var(--ink-dim);font-style:italic}
+
+/* ══════════════════════════════
+   NOTES PAGE
+══════════════════════════════ */
+.notes-layout{display:flex;gap:0;height:calc(100vh - 160px);min-height:400px}
+.notes-sidebar{width:200px;flex-shrink:0;border-right:1px solid var(--border);padding-right:14px;display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+.notes-sidebar::-webkit-scrollbar{width:3px}
+.notes-sidebar::-webkit-scrollbar-thumb{background:var(--border)}
+.notes-main{flex:1;display:flex;flex-direction:column;padding-left:16px;min-width:0}
+.page-tab{padding:8px 10px;border-radius:6px;border:1px solid transparent;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.page-tab:hover{border-color:var(--border);background:var(--ink-faint)}
+.page-tab.active{border-color:var(--gold-dim);background:var(--gold-faint)}
+.page-tab-name{font-family:'Cinzel',serif;font-size:10px;color:var(--ink);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.page-tab.active .page-tab-name{color:var(--gold)}
+.page-tab-del{background:none;border:none;color:var(--ink-dim);cursor:pointer;font-size:12px;opacity:0;transition:opacity .15s;padding:0 2px;border-radius:3px;line-height:1}
+.page-tab:hover .page-tab-del{opacity:1}
+.page-tab-del:hover{color:var(--red-br)}
+.notes-pages-title{font-family:'Cinzel',serif;font-size:9px;color:var(--ink-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.add-page-row{display:flex;gap:5px;margin-top:4px}
+.add-page-inp{flex:1;background:var(--panel2);border:1px solid var(--border);border-radius:5px;color:var(--ink);padding:5px 7px;font-family:'Crimson Text',serif;font-size:12px;outline:none}
+.add-page-inp:focus{border-color:var(--gold-dim)}
+.add-page-inp::placeholder{color:var(--ink-dim)}
+.add-page-btn{width:26px;height:26px;background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--gold);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.add-page-btn:hover{border-color:var(--gold-dim);background:var(--gold-faint)}
+#notes-editor{flex:1;background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);color:var(--ink);font-family:'Crimson Text',serif;font-size:17px;line-height:1.8;padding:18px;resize:none;outline:none;transition:border-color .2s;min-height:0}
+#notes-editor:focus{border-color:var(--gold-dim)}
+.notes-bar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;color:var(--ink-dim);font-style:italic}
+.notes-fmt{display:flex;gap:5px;margin-bottom:8px}
+.fmt-btn{width:28px;height:28px;background:var(--panel2);border:1px solid var(--border);border-radius:5px;color:var(--ink-dim);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.fmt-btn:hover{border-color:var(--gold-dim);color:var(--ink)}
+.notes-view{flex:1;background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;overflow-y:auto;font-size:17px;line-height:1.8;white-space:pre-wrap;min-height:0;color:var(--ink)}
+.notes-view::-webkit-scrollbar{width:4px}
+.notes-view::-webkit-scrollbar-thumb{background:var(--border)}
+.notes-view-empty{color:var(--ink-dim);font-style:italic}
+
+/* ══════════════════════════════
+   KEY POINTS PAGE
+══════════════════════════════ */
+#kp-doc-view{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;min-height:420px;font-size:16px;line-height:1.85;color:var(--ink);white-space:pre-wrap;overflow-y:auto;max-height:calc(100vh - 220px)}
+#kp-doc-view::-webkit-scrollbar{width:4px}
+#kp-doc-view::-webkit-scrollbar-thumb{background:var(--border)}
+#kp-editor{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;min-height:420px;font-family:'Crimson Text',serif;font-size:16px;line-height:1.85;color:var(--ink);resize:none;outline:none;transition:border-color .2s;max-height:calc(100vh - 220px)}
+#kp-editor:focus{border-color:var(--gold-dim)}
+.kp-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+
+/* ══════════════════════════════
+   RECORDING PAGE
+══════════════════════════════ */
+.rec-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+@media(max-width:800px){.rec-layout{grid-template-columns:1fr}}
+.rec-panel{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.rec-panel-title{font-family:'Cinzel',serif;font-size:11px;color:var(--gold-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+/* orb */
+.rec-center{display:flex;flex-direction:column;align-items:center;gap:18px;padding:10px 0}
+.rec-orb{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2e0e0e,#0d0505);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:42px;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.rec-orb:hover{border-color:var(--red-br);box-shadow:0 4px 20px rgba(0,0,0,.5),0 0 18px rgba(192,57,43,.3)}
+.rec-orb.recording{border-color:var(--red-br);animation:orbPulse 1.3s ease-in-out infinite;box-shadow:0 4px 20px rgba(0,0,0,.5),0 0 28px rgba(192,57,43,.45)}
+@keyframes orbPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.rec-timer{font-family:'Cinzel',serif;font-size:32px;color:var(--gold);letter-spacing:.15em}
+.rec-status{font-size:13px;color:var(--ink-dim);font-style:italic;text-align:center}
+.rec-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.wave{display:inline-flex;align-items:center;gap:3px;height:20px}
+.wb{width:3px;background:var(--red-br);border-radius:2px;animation:wb .8s ease-in-out infinite}
+.wb:nth-child(2){animation-delay:.1s}.wb:nth-child(3){animation-delay:.2s}.wb:nth-child(4){animation-delay:.3s}.wb:nth-child(5){animation-delay:.4s}
+@keyframes wb{0%,100%{height:3px}50%{height:18px}}
+/* recordings list */
+.rec-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:7px;margin-bottom:7px;transition:border-color .2s}
+.rec-item:hover{border-color:var(--border2)}
+.rec-play{width:28px;height:28px;border-radius:50%;border:1px solid var(--gold-dim);background:var(--gold-faint);color:var(--gold);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;flex-shrink:0;transition:all .15s}
+.rec-play:hover{background:rgba(201,169,110,.2)}
+.rec-info{flex:1;min-width:0}
+.rec-name{font-family:'Cinzel',serif;font-size:10px;color:var(--ink);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-dur{font-size:11px;color:var(--ink-dim);font-style:italic;margin-top:2px}
+.rec-del{background:none;border:none;color:var(--ink-dim);cursor:pointer;font-size:13px;opacity:0;transition:all .15s;border-radius:3px;padding:2px 4px}
+.rec-item:hover .rec-del{opacity:1}
+.rec-del:hover{color:var(--red-br)}
+.rec-empty{color:var(--ink-dim);font-style:italic;font-size:14px;text-align:center;padding:20px 0}
+/* audio player */
+#audio-player-wrap{margin-top:10px;display:none}
+#audio-player-wrap.show{display:block}
+audio{width:100%;height:32px;filter:sepia(.4) saturate(.7)}
+.now-playing{font-family:'Cinzel',serif;font-size:9px;color:var(--gold-dim);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+
+/* ══════════════════════════════
+   DICE PAGE
+══════════════════════════════ */
+.dice-layout{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
+@media(max-width:700px){.dice-layout{grid-template-columns:1fr}}
+.dice-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.die-btn{aspect-ratio:1;border:2px solid var(--border);border-radius:var(--radius);background:var(--panel2);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:all .2s;font-family:'Cinzel',serif}
+.die-btn:hover{border-color:var(--gold-dim);background:var(--gold-faint);transform:translateY(-2px)}
+.die-btn.selected{border-color:var(--gold);background:rgba(201,169,110,.14);box-shadow:0 0 12px rgba(201,169,110,.15)}
+.die-face{font-size:26px;line-height:1}
+.die-label{font-size:9px;letter-spacing:.08em;color:var(--gold-dim)}
+.die-btn.selected .die-label{color:var(--gold)}
+.dice-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.dice-count-row{display:flex;align-items:center;gap:8px;font-family:'Cinzel',serif;font-size:10px;color:var(--ink-dim);letter-spacing:.06em}
+#dice-count{width:50px;text-align:center}
+#modifier-inp{width:60px;text-align:center}
+.roll-btn{padding:10px 28px;border-radius:var(--radius);border:2px solid var(--gold-dim);background:rgba(201,169,110,.08);color:var(--gold);font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.roll-btn:hover{background:rgba(201,169,110,.18);border-color:var(--gold);box-shadow:0 0 16px rgba(201,169,110,.2)}
+.roll-btn:active{transform:scale(.97)}
+.roll-result-area{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.roll-total{font-family:'Cinzel',serif;font-size:56px;color:var(--gold);line-height:1;transition:all .2s}
+.roll-total.crit{color:#4aff4a;text-shadow:0 0 20px rgba(74,255,74,.4)}
+.roll-total.fumble{color:var(--red-br);text-shadow:0 0 20px rgba(192,57,43,.4)}
+.roll-detail{font-size:13px;color:var(--ink-dim);font-style:italic}
+.roll-dice-display{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.roll-die-result{width:34px;height:34px;border-radius:6px;background:var(--panel);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;color:var(--ink);transition:all .3s}
+.roll-die-result.max{border-color:#4aff4a;color:#4aff4a}
+.roll-die-result.min{border-color:var(--red-br);color:var(--red-br)}
+@keyframes diceRoll{0%{transform:rotateZ(0)}25%{transform:rotateZ(-15deg)}75%{transform:rotateZ(15deg)}100%{transform:rotateZ(0)}}
+.rolling{animation:diceRoll .4s ease}
+.roll-history{background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.roll-history-title{font-family:'Cinzel',serif;font-size:9px;color:var(--gold-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.roll-hist-item{padding:7px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.roll-hist-item:last-child{border-bottom:none}
+.roll-hist-label{color:var(--ink-dim);font-style:italic}
+.roll-hist-val{font-family:'Cinzel',serif;font-size:14px;color:var(--gold)}
+.roll-hist-val.crit{color:#4aff4a}
+.roll-hist-val.fumble{color:var(--red-br)}
+
+/* ══════════════════════════════
+   MODAL
+══════════════════════════════ */
+#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;align-items:center;justify-content:center}
+#modal.open{display:flex}
+.modal-box{background:var(--panel);border:1px solid var(--gold-dim);border-radius:10px;padding:32px;width:340px;max-width:90vw;text-align:center}
+.modal-title{font-family:'Cinzel',serif;font-size:17px;color:var(--gold);letter-spacing:.1em;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--ink-dim);font-style:italic;margin-bottom:20px}
+.modal-inp{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--ink);padding:10px 14px;font-family:'Crimson Text',serif;font-size:17px;outline:none;text-align:center;letter-spacing:.2em;margin-bottom:14px;transition:border-color .2s}
+.modal-inp:focus{border-color:var(--gold-dim)}
+.modal-err{color:var(--red-br);font-size:12px;font-style:italic;margin-top:-6px;margin-bottom:10px;display:none}
+.modal-btns{display:flex;gap:10px;justify-content:center}
+
+/* ══════════════════════════════
+   TOAST
+══════════════════════════════ */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--panel);border:1px solid var(--gold-dim);border-radius:7px;padding:10px 18px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;color:var(--gold);opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;z-index:200}
+#toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div class="logo">⚔<br><span style="font-size:11px">DM</span></div>
+  <button class="nav-btn active" onclick="goTo('map')" id="nav-map"><span class="icon">🗺</span><span class="lbl">Map</span></button>
+  <button class="nav-btn" onclick="goTo('notes')" id="nav-notes"><span class="icon">📜</span><span class="lbl">Notes</span></button>
+  <button class="nav-btn" onclick="goTo('keypoints')" id="nav-keypoints"><span class="icon">📖</span><span class="lbl">Keys</span></button>
+  <button class="nav-btn" onclick="goTo('recording')" id="nav-recording"><span class="icon">🎙</span><span class="lbl">Audio</span><span class="lock-dot" id="rec-dot"></span></button>
+  <button class="nav-btn" onclick="goTo('dice')" id="nav-dice"><span class="icon">🎲</span><span class="lbl">Dice</span></button>
+  <div class="spacer"></div>
+  <button id="admin-btn" onclick="toggleAdmin()">⚙<br>Admin</button>
+</nav>
+
+<div id="main">
+  <div id="topbar">
+    <span id="page-title">WORLD MAP</span>
+    <div id="sync-indicator"><span class="sync-dot"></span>Auto-saving</div>
+    <div id="role-pill" class="player">PLAYER</div>
+  </div>
+  <div id="content">
+
+    <!-- ════ MAP ════ -->
+    <div id="page-map" class="page active">
+      <div class="sh">
+        <h2>World Map</h2>
+        <span class="badge green">ALL CAN VIEW</span>
+        <span class="badge red" id="map-admin-badge" style="display:none">ADMIN — PIN MODE</span>
+      </div>
+      <div class="map-tb">
+        <div id="map-admin-tools" style="display:none;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-gold" onclick="document.getElementById('map-upload-inp').click()">📂 Upload Map Image</button>
+          <input type="file" id="map-upload-inp" accept="image/*" style="display:none" onchange="handleMapUpload(event)">
+          <button class="btn btn-ghost" id="map-clear-btn" onclick="clearMap()" style="display:none">✕ Clear Map</button>
+          <span class="pin-label">|</span>
+          <span class="pin-label">Place pin:</span>
+          <div class="map-pin-type" id="pin-type-row">
+            <button class="pin-type-btn active" data-type="city" onclick="setPinType(this)">🏙 City</button>
+            <button class="pin-type-btn" data-type="dungeon" onclick="setPinType(this)">⚔ Dungeon</button>
+            <button class="pin-type-btn" data-type="forest" onclick="setPinType(this)">🌲 Forest</button>
+            <button class="pin-type-btn" data-type="tavern" onclick="setPinType(this)">🍺 Tavern</button>
+            <button class="pin-type-btn" data-type="quest" onclick="setPinType(this)">❗ Quest</button>
+          </div>
+          <button class="btn btn-ghost" id="pin-mode-btn" onclick="togglePinMode()">📍 Pin Mode: OFF</button>
+        </div>
+        <div id="map-player-hint" style="font-size:13px;color:var(--ink-dim);font-style:italic">Zoom with scroll · Drag to pan</div>
+      </div>
+      <div id="map-wrap"
+        onmousedown="mapDragStart(event)"
+        onmousemove="mapDragMove(event)"
+        onmouseup="mapDragEnd()"
+        onmouseleave="mapDragEnd()"
+        onwheel="mapScroll(event)"
+        onclick="mapClickPin(event)">
+        <div id="map-placeholder"><div class="big">🗺</div>No map uploaded yet.<br>An admin can upload a map image.</div>
+        <img id="map-img" draggable="false" alt="Campaign map">
+        <svg id="map-pins-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+        <div class="map-ctrl">
+          <button class="map-c-btn" onclick="mapZoom(1.2)" title="Zoom in">+</button>
+          <button class="map-c-btn" onclick="mapZoom(0.85)" title="Zoom out">−</button>
+          <button class="map-c-btn" onclick="mapReset()" title="Reset">⟳</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ NOTES ════ -->
+    <div id="page-notes" class="page">
+      <div class="sh">
+        <h2>Session Notes</h2>
+        <span class="badge green">ALL CAN EDIT</span>
+      </div>
+      <div class="notes-layout">
+        <div class="notes-sidebar">
+          <div class="notes-pages-title">Pages</div>
+          <div id="notes-tabs"></div>
+          <div class="add-page-row">
+            <input class="add-page-inp" id="new-page-inp" placeholder="Page name…" onkeydown="if(event.key==='Enter')addNotesPage()">
+            <button class="add-page-btn" onclick="addNotesPage()" title="Add page">+</button>
+          </div>
+        </div>
+        <div class="notes-main">
+          <div class="notes-fmt">
+            <button class="fmt-btn" title="Bold" onclick="fmtWrap('**','**')"><b>B</b></button>
+            <button class="fmt-btn" title="Italic" onclick="fmtWrap('_','_')"><i>I</i></button>
+            <button class="fmt-btn" title="Heading" onclick="fmtLine('## ')">H</button>
+            <button class="fmt-btn" title="Bullet" onclick="fmtLine('• ')">•</button>
+            <button class="fmt-btn" title="Divider" onclick="insertTxt('\n---\n')">—</button>
+          </div>
+          <textarea class="inp" id="notes-editor" placeholder="Write your session notes here…" oninput="saveNotesDebounced()"></textarea>
+          <div class="notes-bar">
+            <span id="notes-wc">0 words · Saved</span>
+            <button class="btn btn-ghost" onclick="deleteCurrentNotesPage()" style="font-size:8px">Delete page</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ KEY POINTS ════ -->
+    <div id="page-keypoints" class="page">
+      <div class="sh">
+        <h2>Key Points</h2>
+        <span class="badge green" id="kp-view-badge">ALL CAN VIEW</span>
+        <span class="badge red" id="kp-edit-badge" style="display:none">ADMIN EDITING</span>
+        <div style="margin-left:auto;display:flex;gap:8px" id="kp-admin-controls" style="display:none!important">
+          <button class="btn btn-green" onclick="saveKP()">✦ Save</button>
+        </div>
+      </div>
+      <div class="kp-bar" id="kp-bar" style="display:none">
+        <span style="font-size:13px;color:var(--ink-dim);font-style:italic">Editing as Dungeon Master — changes save automatically</span>
+        <button class="btn btn-green" onclick="saveKP()">✦ Save</button>
+      </div>
+      <textarea id="kp-editor" class="inp" placeholder="Write key plot points, NPC details, secrets, revelations…&#10;&#10;Use this as a DM reference document. Players will see a read-only view." style="display:none;min-height:420px;max-height:calc(100vh - 240px);resize:none;font-size:16px;line-height:1.85" oninput="saveKPDebounced()"></textarea>
+      <div id="kp-doc-view"></div>
+    </div>
+
+    <!-- ════ RECORDING ════ -->
+    <div id="page-recording" class="page">
+      <div class="sh">
+        <h2>Session Audio</h2>
+        <span class="badge red" id="rec-admin-badge" style="display:none">ADMIN RECORDS</span>
+        <span class="badge blue">PLAYERS CAN LISTEN</span>
+      </div>
+      <!-- Player locked from record controls -->
+      <div id="rec-player-view">
+        <div class="rec-layout">
+          <div>
+            <div class="rec-panel">
+              <div class="rec-panel-title">Saved Recordings</div>
+              <div id="rec-list-player"></div>
+              <div id="audio-player-wrap">
+                <div class="now-playing" id="now-playing-label">Now Playing</div>
+                <audio id="audio-el" controls></audio>
+              </div>
+            </div>
+          </div>
+          <div id="rec-admin-panel" style="display:none">
+            <div class="rec-panel">
+              <div class="rec-panel-title">Record New Session</div>
+              <div class="rec-center">
+                <div class="rec-orb" id="rec-orb" onclick="toggleRecording()"><span id="rec-orb-icon">🎙</span></div>
+                <div class="rec-timer" id="rec-timer">00:00:00</div>
+                <div class="rec-status" id="rec-status">Tap to start recording</div>
+                <div class="rec-btns">
+                  <button class="btn btn-ghost" id="rec-pause-btn" onclick="pauseRec()" style="display:none">⏸ Pause</button>
+                  <button class="btn btn-red" id="rec-stop-btn" onclick="stopRec()" style="display:none">⏹ Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ DICE ════ -->
+    <div id="page-dice" class="page">
+      <div class="sh"><h2>Dice Roller</h2><span class="badge green">ALL CAN ROLL</span></div>
+      <div class="dice-layout">
+        <div>
+          <div class="dice-grid" id="dice-grid">
+            <button class="die-btn selected" data-sides="4" onclick="selectDie(this)"><span class="die-face">🔺</span><span class="die-label">D4</span></button>
+            <button class="die-btn" data-sides="6" onclick="selectDie(this)"><span class="die-face">⬡</span><span class="die-label">D6</span></button>
+            <button class="die-btn" data-sides="8" onclick="selectDie(this)"><span class="die-face">💠</span><span class="die-label">D8</span></button>
+            <button class="die-btn" data-sides="10" onclick="selectDie(this)"><span class="die-face">🔟</span><span class="die-label">D10</span></button>
+            <button class="die-btn" data-sides="12" onclick="selectDie(this)"><span class="die-face">🔶</span><span class="die-label">D12</span></button>
+            <button class="die-btn" data-sides="20" onclick="selectDie(this)"><span class="die-face">🎲</span><span class="die-label">D20</span></button>
+            <button class="die-btn" data-sides="100" onclick="selectDie(this)"><span class="die-face">💯</span><span class="die-label">D100</span></button>
+            <button class="die-btn" data-sides="2" onclick="selectDie(this)"><span class="die-face">🪙</span><span class="die-label">Coin</span></button>
+          </div>
+          <div class="dice-controls">
+            <div class="dice-count-row">
+              <span>Dice:</span>
+              <input class="inp" id="dice-count" type="number" value="1" min="1" max="20" style="width:55px">
+              <span>Modifier:</span>
+              <input class="inp" id="modifier-inp" type="number" value="0" style="width:60px">
+            </div>
+          </div>
+          <button class="roll-btn" onclick="rollDice()">🎲 Roll</button>
+          <div class="roll-result-area" id="roll-result-area" style="margin-top:16px">
+            <div style="color:var(--ink-dim);font-style:italic;font-size:15px">Select a die and roll</div>
+          </div>
+        </div>
+        <div>
+          <div class="roll-history">
+            <div class="roll-history-title">Roll History</div>
+            <div id="roll-history-list"><div style="color:var(--ink-dim);font-style:italic;font-size:13px;text-align:center;padding:10px 0">No rolls yet</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ADMIN MODAL -->
+<div id="modal">
+  <div class="modal-box">
+    <div class="modal-title">Dungeon Master Access</div>
+    <div class="modal-sub">Enter the passphrase to unlock admin controls.</div>
+    <input type="password" class="modal-inp" id="modal-inp" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitModal()">
+    <div class="modal-err" id="modal-err">Incorrect passphrase. Try again.</div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="submitModal()">Unlock</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+//  STATE & STORAGE
+// ═══════════════════════════════════════
+const PASS = 'dungeon'; // change this!
+let isAdmin = false;
+let currentPage = 'map';
+
+// Notes state
+let notesPages = [];   // [{id, name, content}]
+let currentNoteId = null;
+let notesSaveTimer = null;
+
+// Key Points
+let kpContent = '';
+let kpSaveTimer = null;
+
+// Map
+let mapData = { hasImage: false, imageData: null, pins: [] };
+let mapScale = 1, mapPanX = 0, mapPanY = 0;
+let mapDragging = false, mdx = 0, mdy = 0, mspx = 0, mspy = 0;
+let pinMode = false;
+let selectedPinType = 'city';
+
+// Recordings — stored as base64 in localStorage (small sessions only; warn if large)
+let recordings = [];
+
+// Dice
+let selectedDieSides = 4;
+let rollHistory = [];
+
+const PIN_COLORS = { city:'#c9a96e', dungeon:'#c0392b', forest:'#4a9a4a', tavern:'#b87a2a', quest:'#e6cc00' };
+const PIN_EMOJI  = { city:'🏙', dungeon:'⚔', forest:'🌲', tavern:'🍺', quest:'❗' };
+
+// ─── Load from localStorage ───
+function load() {
+  try {
+    notesPages = JSON.parse(localStorage.getItem('dnd_notes') || '[]');
+    kpContent  = localStorage.getItem('dnd_kp') || '';
+    recordings = JSON.parse(localStorage.getItem('dnd_recs') || '[]');
+    const md   = localStorage.getItem('dnd_map');
+    if (md) mapData = JSON.parse(md);
+  } catch(e) {}
+  if (!notesPages.length) notesPages = [{ id: uid(), name: 'Session 1', content: '' }];
+  currentNoteId = notesPages[0].id;
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+function save(key, val) { try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); } catch(e) { toast('Storage full — try clearing recordings'); } }
+
+// Auto-sync: poll localStorage every 3 seconds (for multi-device on shared screen)
+setInterval(() => {
+  if (document.hidden) return;
+  try {
+    const newKP = localStorage.getItem('dnd_kp') || '';
+    if (newKP !== kpContent) { kpContent = newKP; renderKP(); }
+    const newRecs = JSON.parse(localStorage.getItem('dnd_recs') || '[]');
+    if (JSON.stringify(newRecs) !== JSON.stringify(recordings)) { recordings = newRecs; renderRecList(); }
+    const newNotes = JSON.parse(localStorage.getItem('dnd_notes') || '[]');
+    if (JSON.stringify(newNotes) !== JSON.stringify(notesPages)) {
+      notesPages = newNotes;
+      if (!notesPages.length) notesPages = [{ id: uid(), name: 'Session 1', content: '' }];
+      if (!notesPages.find(p => p.id === currentNoteId)) currentNoteId = notesPages[0].id;
+      renderNotesTabs(); renderNotesContent();
+    }
+    const md = localStorage.getItem('dnd_map');
+    if (md) { const parsed = JSON.parse(md); if (JSON.stringify(parsed) !== JSON.stringify(mapData)) { mapData = parsed; applyMapImage(); renderMapPins(); } }
+  } catch(e) {}
+}, 3000);
+
+// ═══════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+  currentPage = page;
+  const T = { map:'WORLD MAP', notes:'SESSION NOTES', keypoints:'KEY POINTS', recording:'SESSION AUDIO', dice:'DICE ROLLER' };
+  document.getElementById('page-title').textContent = T[page] || page.toUpperCase();
+}
+
+// ═══════════════════════════════════════
+//  ADMIN
+// ═══════════════════════════════════════
+function toggleAdmin() {
+  if (isAdmin) {
+    isAdmin = false;
+    applyRole();
+    toast('Returned to player mode');
+  } else {
+    document.getElementById('modal').classList.add('open');
+    document.getElementById('modal-inp').value = '';
+    document.getElementById('modal-err').style.display = 'none';
+    setTimeout(() => document.getElementById('modal-inp').focus(), 60);
+  }
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
+function submitModal() {
+  if (document.getElementById('modal-inp').value === PASS) {
+    isAdmin = true; closeModal(); applyRole(); toast('Admin access granted ⚔');
+  } else {
+    document.getElementById('modal-err').style.display = 'block';
+    document.getElementById('modal-inp').value = '';
+    document.getElementById('modal-inp').focus();
+  }
+}
+function applyRole() {
+  const pill = document.getElementById('role-pill');
+  const abtn = document.getElementById('admin-btn');
+  if (isAdmin) {
+    pill.className = 'admin'; pill.textContent = 'DUNGEON MASTER';
+    abtn.classList.add('on');
+  } else {
+    pill.className = 'player'; pill.textContent = 'PLAYER';
+    abtn.classList.remove('on');
+  }
+  // map
+  const mat = document.getElementById('map-admin-tools');
+  const mph = document.getElementById('map-player-hint');
+  const mab = document.getElementById('map-admin-badge');
+  mat.style.display = isAdmin ? 'flex' : 'none';
+  mph.style.display = isAdmin ? 'none' : '';
+  mab.style.display = isAdmin ? '' : 'none';
+  if (!isAdmin && pinMode) { pinMode = false; document.getElementById('map-pins-svg').classList.remove('pin-mode'); }
+  // kp
+  renderKP();
+  // rec
+  document.getElementById('rec-admin-panel').style.display = isAdmin ? '' : 'none';
+  document.getElementById('rec-admin-badge').style.display = isAdmin ? '' : 'none';
+  document.getElementById('rec-dot').style.display = isAdmin ? 'none' : '';
+  // map lock-dot
+  document.getElementById('rec-dot').style.display = isAdmin ? 'none' : '';
+}
+
+// ═══════════════════════════════════════
+//  MAP
+// ═══════════════════════════════════════
+function handleMapUpload(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    mapData.hasImage = true;
+    mapData.imageData = ev.target.result;
+    mapReset();
+    applyMapImage();
+    save('dnd_map', mapData);
+    toast('Map uploaded');
+    document.getElementById('map-clear-btn').style.display = '';
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+function applyMapImage() {
+  const img = document.getElementById('map-img');
+  const ph  = document.getElementById('map-placeholder');
+  const clearBtn = document.getElementById('map-clear-btn');
+  if (mapData.hasImage && mapData.imageData) {
+    img.src = mapData.imageData;
+    img.classList.add('loaded');
+    ph.style.display = 'none';
+    clearBtn.style.display = '';
+    applyMapTransform();
+  } else {
+    img.classList.remove('loaded');
+    ph.style.display = '';
+    clearBtn.style.display = 'none';
+  }
+  renderMapPins();
+}
+function clearMap() {
+  if (!confirm('Remove map image and all pins?')) return;
+  mapData = { hasImage: false, imageData: null, pins: [] };
+  mapReset();
+  applyMapImage();
+  save('dnd_map', mapData);
+  toast('Map cleared');
+}
+function applyMapTransform() {
+  const img = document.getElementById('map-img');
+  img.style.transform = `translate(${mapPanX}px,${mapPanY}px) scale(${mapScale})`;
+}
+function mapReset() { mapScale=1; mapPanX=0; mapPanY=0; applyMapTransform(); }
+function mapZoom(f) { mapScale = Math.max(.2, Math.min(6, mapScale*f)); applyMapTransform(); }
+function mapScroll(e) { e.preventDefault(); mapZoom(e.deltaY < 0 ? 1.1 : 0.9); }
+function mapDragStart(e) {
+  if (pinMode) return;
+  mapDragging=true; mdx=e.clientX; mdy=e.clientY; mspx=mapPanX; mspy=mapPanY;
+}
+function mapDragMove(e) {
+  if (!mapDragging) return;
+  mapPanX = mspx+(e.clientX-mdx); mapPanY = mspy+(e.clientY-mdy); applyMapTransform();
+}
+function mapDragEnd() { mapDragging=false; }
+
+function togglePinMode() {
+  if (!isAdmin) return;
+  pinMode = !pinMode;
+  const svg = document.getElementById('map-pins-svg');
+  const btn = document.getElementById('pin-mode-btn');
+  if (pinMode) { svg.classList.add('pin-mode'); btn.textContent = '📍 Pin Mode: ON'; btn.style.borderColor='var(--gold)'; btn.style.color='var(--gold)'; }
+  else          { svg.classList.remove('pin-mode'); btn.textContent = '📍 Pin Mode: OFF'; btn.style.borderColor=''; btn.style.color=''; }
+}
+function setPinType(btn) {
+  document.querySelectorAll('.pin-type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedPinType = btn.dataset.type;
+}
+function mapClickPin(e) {
+  if (!pinMode || !isAdmin) return;
+  const wrap = document.getElementById('map-wrap');
+  const rect = wrap.getBoundingClientRect();
+  // Convert to percentage coordinates (0-1000 space)
+  const px = ((e.clientX - rect.left - mapPanX) / (rect.width * mapScale)) * 1000;
+  const py = ((e.clientY - rect.top  - mapPanY) / (rect.height * mapScale)) * 1000;
+  const label = prompt('Pin label:', PIN_EMOJI[selectedPinType] + ' ' + selectedPinType.charAt(0).toUpperCase()+selectedPinType.slice(1));
+  if (label === null) return;
+  mapData.pins.push({ id: uid(), x: px, y: py, type: selectedPinType, label });
+  save('dnd_map', mapData);
+  renderMapPins();
+  toast('Pin placed');
+}
+function renderMapPins() {
+  const svg = document.getElementById('map-pins-svg');
+  svg.innerHTML = '';
+  mapData.pins.forEach(pin => {
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('transform', `translate(${pin.x},${pin.y})`);
+    g.innerHTML = `
+      <circle r="14" fill="${PIN_COLORS[pin.type]}" opacity="0.92" stroke="#000" stroke-width="1.5"/>
+      <text y="5" text-anchor="middle" font-size="14" font-family="sans-serif">${PIN_EMOJI[pin.type]}</text>
+      <text y="26" text-anchor="middle" fill="${PIN_COLORS[pin.type]}" font-size="9" font-family="Cinzel,serif" stroke="#0a0704" stroke-width="2" paint-order="stroke">${esc(pin.label)}</text>
+      ${isAdmin ? `<circle r="7" cx="12" cy="-12" fill="#1b1409" stroke="${PIN_COLORS[pin.type]}" stroke-width="1" class="pin-del-hit" data-id="${pin.id}" style="cursor:pointer"/>
+      <text x="12" y="-8" text-anchor="middle" font-size="9" fill="#fff" pointer-events="none">✕</text>` : ''}
+    `;
+    svg.appendChild(g);
+  });
+  // bind delete
+  svg.querySelectorAll('.pin-del-hit').forEach(el => {
+    el.addEventListener('click', ev => {
+      ev.stopPropagation();
+      if (!isAdmin) return;
+      mapData.pins = mapData.pins.filter(p => p.id !== el.dataset.id);
+      save('dnd_map', mapData);
+      renderMapPins();
+      toast('Pin removed');
+    });
+  });
+}
+
+// ═══════════════════════════════════════
+//  NOTES
+// ═══════════════════════════════════════
+function renderNotesTabs() {
+  const tabs = document.getElementById('notes-tabs');
+  tabs.innerHTML = notesPages.map(p => `
+    <div class="page-tab ${p.id===currentNoteId?'active':''}" onclick="switchNotesPage('${p.id}')">
+      <span class="page-tab-name">${esc(p.name)}</span>
+      <button class="page-tab-del" onclick="event.stopPropagation();deleteNotesPage('${p.id}')" title="Delete page">✕</button>
+    </div>
+  `).join('');
+}
+function renderNotesContent() {
+  const page = notesPages.find(p=>p.id===currentNoteId);
+  const ed = document.getElementById('notes-editor');
+  if (page) { ed.value = page.content || ''; updateNoteWC(); }
+}
+function switchNotesPage(id) {
+  // save current
+  const cur = notesPages.find(p=>p.id===currentNoteId);
+  if (cur) cur.content = document.getElementById('notes-editor').value;
+  currentNoteId = id;
+  renderNotesTabs();
+  renderNotesContent();
+}
+function addNotesPage() {
+  const inp = document.getElementById('new-page-inp');
+  const name = inp.value.trim() || 'Page ' + (notesPages.length+1);
+  const page = { id: uid(), name, content: '' };
+  // save current content first
+  const cur = notesPages.find(p=>p.id===currentNoteId);
+  if (cur) cur.content = document.getElementById('notes-editor').value;
+  notesPages.push(page);
+  currentNoteId = page.id;
+  inp.value = '';
+  save('dnd_notes', notesPages);
+  renderNotesTabs();
+  renderNotesContent();
+  toast('Page added: ' + name);
+}
+function deleteCurrentNotesPage() { deleteNotesPage(currentNoteId); }
+function deleteNotesPage(id) {
+  if (notesPages.length <= 1) { toast('Cannot delete the last page'); return; }
+  if (!confirm('Delete this page and its content?')) return;
+  notesPages = notesPages.filter(p=>p.id!==id);
+  if (currentNoteId===id) currentNoteId = notesPages[0].id;
+  save('dnd_notes', notesPages);
+  renderNotesTabs();
+  renderNotesContent();
+  toast('Page deleted');
+}
+function saveNotesDebounced() {
+  updateNoteWC();
+  clearTimeout(notesSaveTimer);
+  notesSaveTimer = setTimeout(() => {
+    const cur = notesPages.find(p=>p.id===currentNoteId);
+    if (cur) { cur.content = document.getElementById('notes-editor').value; save('dnd_notes', notesPages); }
+  }, 800);
+}
+function updateNoteWC() {
+  const v = document.getElementById('notes-editor').value;
+  const w = v.trim() ? v.trim().split(/\s+/).length : 0;
+  document.getElementById('notes-wc').textContent = w + ' word' + (w!==1?'s':'') + ' · Saved';
+}
+function fmtWrap(a,b) {
+  const ed=document.getElementById('notes-editor'),s=ed.selectionStart,e=ed.selectionEnd,sel=ed.value.slice(s,e)||'text';
+  ed.setRangeText(a+sel+b,s,e,'select'); ed.focus(); saveNotesDebounced();
+}
+function fmtLine(prefix) {
+  const ed=document.getElementById('notes-editor'),s=ed.selectionStart,ls=ed.value.lastIndexOf('\n',s-1)+1;
+  ed.setRangeText(prefix,ls,ls,'end'); ed.focus(); saveNotesDebounced();
+}
+function insertTxt(txt) {
+  const ed=document.getElementById('notes-editor'),s=ed.selectionStart;
+  ed.setRangeText(txt,s,s,'end'); ed.focus(); saveNotesDebounced();
+}
+
+// ═══════════════════════════════════════
+//  KEY POINTS
+// ═══════════════════════════════════════
+function renderKP() {
+  const editor = document.getElementById('kp-editor');
+  const view   = document.getElementById('kp-doc-view');
+  const bar    = document.getElementById('kp-bar');
+  const eb     = document.getElementById('kp-edit-badge');
+  const vb     = document.getElementById('kp-view-badge');
+  editor.value = kpContent;
+  if (isAdmin) {
+    editor.style.display = ''; view.style.display = 'none';
+    bar.style.display = 'flex'; eb.style.display = ''; vb.style.display = 'none';
+  } else {
+    editor.style.display = 'none'; view.style.display = '';
+    bar.style.display = 'none'; eb.style.display = 'none'; vb.style.display = '';
+    view.innerHTML = kpContent
+      ? '<div style="white-space:pre-wrap">' + esc(kpContent) + '</div>'
+      : '<div class="notes-view-empty">The Dungeon Master has not yet added any key points.</div>';
+  }
+}
+function saveKP() {
+  kpContent = document.getElementById('kp-editor').value;
+  save('dnd_kp', kpContent);
+  toast('Key points saved');
+}
+function saveKPDebounced() {
+  clearTimeout(kpSaveTimer);
+  kpSaveTimer = setTimeout(saveKP, 1000);
+}
+
+// ═══════════════════════════════════════
+//  RECORDING
+// ═══════════════════════════════════════
+let recState = 'idle', recSecs = 0, recInt = null;
+let mediaRecorder = null, audioChunks = [];
+
+function toggleRecording() {
+  if (!isAdmin) return;
+  if (recState === 'idle') startRec();
+  else if (recState === 'recording') pauseRec();
+  else if (recState === 'paused') resumeRec();
+}
+function startRec() {
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = e => { if (e.data.size>0) audioChunks.push(e.data); };
+    mediaRecorder.start(200);
+    recState = 'recording'; recSecs = 0;
+    document.getElementById('rec-orb').classList.add('recording');
+    document.getElementById('rec-orb-icon').textContent = '⏸';
+    document.getElementById('rec-status').innerHTML = '<span style="display:flex;align-items:center;gap:6px;justify-content:center"><span class="wave"><span class="wb"></span><span class="wb"></span><span class="wb"></span><span class="wb"></span><span class="wb"></span></span> Recording…</span>';
+    document.getElementById('rec-pause-btn').style.display = '';
+    document.getElementById('rec-stop-btn').style.display = '';
+    recInt = setInterval(()=>{ recSecs++; updateRecTimer(); }, 1000);
+    toast('Recording started 🎙');
+  }).catch(()=>{ toast('Microphone access denied'); });
+}
+function pauseRec() {
+  if (recState!=='recording') return;
+  mediaRecorder.pause(); clearInterval(recInt); recState='paused';
+  document.getElementById('rec-orb').classList.remove('recording');
+  document.getElementById('rec-orb-icon').textContent = '▶';
+  document.getElementById('rec-status').textContent = 'Paused — tap orb to resume';
+  document.getElementById('rec-pause-btn').textContent = '▶ Resume';
+  toast('Paused');
+}
+function resumeRec() {
+  if (recState!=='paused') return;
+  mediaRecorder.resume(); recState='recording';
+  document.getElementById('rec-orb').classList.add('recording');
+  document.getElementById('rec-orb-icon').textContent = '⏸';
+  document.getElementById('rec-status').innerHTML = '<span style="display:flex;align-items:center;gap:6px;justify-content:center"><span class="wave"><span class="wb"></span><span class="wb"></span><span class="wb"></span><span class="wb"></span><span class="wb"></span></span> Recording…</span>';
+  document.getElementById('rec-pause-btn').textContent = '⏸ Pause';
+  recInt = setInterval(()=>{ recSecs++; updateRecTimer(); }, 1000);
+  toast('Resumed');
+}
+function stopRec() {
+  clearInterval(recInt);
+  mediaRecorder.stop();
+  mediaRecorder.stream.getTracks().forEach(t=>t.stop());
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const now = new Date();
+      const label = `Session — ${now.toLocaleDateString('en-US',{month:'short',day:'numeric'})} ${now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;
+      recordings.unshift({ id: uid(), label, dur: recSecs, data: ev.target.result });
+      save('dnd_recs', recordings);
+      renderRecList();
+      toast('Recording saved ✦');
+    };
+    reader.readAsDataURL(blob);
+  };
+  recState = 'idle';
+  document.getElementById('rec-orb').classList.remove('recording');
+  document.getElementById('rec-orb-icon').textContent = '🎙';
+  document.getElementById('rec-status').textContent = 'Tap to start recording';
+  document.getElementById('rec-pause-btn').style.display = 'none';
+  document.getElementById('rec-stop-btn').style.display = 'none';
+  document.getElementById('rec-pause-btn').textContent = '⏸ Pause';
+  document.getElementById('rec-timer').textContent = '00:00:00';
+  recSecs = 0;
+}
+function updateRecTimer() {
+  const h=Math.floor(recSecs/3600),m=Math.floor((recSecs%3600)/60),s=recSecs%60;
+  document.getElementById('rec-timer').textContent=`${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+function renderRecList() {
+  const list = document.getElementById('rec-list-player');
+  if (!recordings.length) {
+    list.innerHTML = '<div class="rec-empty">No recordings yet. The DM can record sessions.</div>';
+    return;
+  }
+  list.innerHTML = recordings.map(r => `
+    <div class="rec-item">
+      <button class="rec-play" onclick="playRec('${r.id}')" title="Play">▶</button>
+      <div class="rec-info">
+        <div class="rec-name">${esc(r.label)}</div>
+        <div class="rec-dur">${fmtDur(r.dur)}</div>
+      </div>
+      ${isAdmin ? `<button class="rec-del" onclick="deleteRec('${r.id}')" title="Delete">✕</button>` : ''}
+    </div>
+  `).join('');
+}
+function playRec(id) {
+  const rec = recordings.find(r=>r.id===id); if (!rec) return;
+  const audio = document.getElementById('audio-el');
+  audio.src = rec.data;
+  audio.play();
+  document.getElementById('now-playing-label').textContent = '▶ ' + rec.label;
+  const wrap = document.getElementById('audio-player-wrap');
+  wrap.classList.add('show');
+  toast('Playing: ' + rec.label);
+}
+function deleteRec(id) {
+  if (!confirm('Delete this recording?')) return;
+  recordings = recordings.filter(r=>r.id!==id);
+  save('dnd_recs', recordings);
+  renderRecList();
+  toast('Recording deleted');
+}
+
+// ═══════════════════════════════════════
+//  DICE
+// ═══════════════════════════════════════
+function selectDie(btn) {
+  document.querySelectorAll('.die-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedDieSides = parseInt(btn.dataset.sides);
+}
+function rollDice() {
+  const count = Math.max(1, Math.min(20, parseInt(document.getElementById('dice-count').value)||1));
+  const mod   = parseInt(document.getElementById('modifier-inp').value)||0;
+  const sides = selectedDieSides;
+  const rolls = Array.from({length:count}, ()=>Math.floor(Math.random()*sides)+1);
+  const sum   = rolls.reduce((a,b)=>a+b,0) + mod;
+  const isNat20 = sides===20 && count===1 && rolls[0]===20;
+  const isFumble= sides===20 && count===1 && rolls[0]===1;
+
+  // Animate result
+  const area = document.getElementById('roll-result-area');
+  const dieLabel = sides===2 ? (rolls[0]===1?'Heads':'Tails') : null;
+  let cls = '';
+  if (isNat20) cls = 'crit';
+  if (isFumble) cls = 'fumble';
+  area.innerHTML = `
+    <div class="roll-total ${cls}" id="roll-total-num">${dieLabel || sum}</div>
+    <div class="roll-detail">
+      ${count}d${sides}${mod!==0?(mod>0?'+':'')+mod:''}
+      = [${rolls.join(', ')}]${mod!==0?' + '+mod:''}
+      ${isNat20?'<span style="color:#4aff4a;margin-left:6px">✦ NATURAL 20!</span>':''}
+      ${isFumble?'<span style="color:var(--red-br);margin-left:6px">💀 CRITICAL FAIL</span>':''}
+    </div>
+    <div class="roll-dice-display">
+      ${rolls.map(r=>`<div class="roll-die-result ${r===sides?'max':''} ${r===1?'min':''}">${r}</div>`).join('')}
+    </div>
+  `;
+  // bounce animation
+  const el = document.getElementById('roll-total-num');
+  el.classList.add('rolling');
+  setTimeout(()=>el.classList.remove('rolling'),400);
+
+  // history
+  const label = `${count}d${sides}${mod?( mod>0?'+':'')+mod:''}`;
+  rollHistory.unshift({ label, result: dieLabel||sum, cls });
+  if (rollHistory.length>20) rollHistory.pop();
+  renderRollHistory();
+}
+function renderRollHistory() {
+  const list = document.getElementById('roll-history-list');
+  if (!rollHistory.length) { list.innerHTML='<div style="color:var(--ink-dim);font-style:italic;font-size:13px;text-align:center;padding:10px 0">No rolls yet</div>'; return; }
+  list.innerHTML = rollHistory.slice(0,12).map(h=>`
+    <div class="roll-hist-item">
+      <span class="roll-hist-label">${h.label}</span>
+      <span class="roll-hist-val ${h.cls||''}">${h.result}</span>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════
+function pad(n){return String(n).padStart(2,'0')}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function fmtDur(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return h>0?`${h}h ${pad(m)}m ${pad(sec)}s`:`${pad(m)}m ${pad(sec)}s`}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+load();
+renderNotesTabs();
+renderNotesContent();
+renderKP();
+renderRecList();
+applyMapImage();
+applyRole();
+</script>
+</body>
+</html>
